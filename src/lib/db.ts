@@ -2,20 +2,16 @@ import { neon } from "@neondatabase/serverless";
 import { auth } from "@/lib/auth/server";
 
 export async function getStats() {
-  const { data: session } = await auth.getSession();
-  if (!session?.user) throw new Error("Unauthorized");
-
-  const db = neon(process.env.DATABASE_URL!);
-  const [businesses, engagements, assessments] = await Promise.all([
-    db.query("select count(*)::int n from businesses where business_status <> 'archived'"),
-    db.query("select count(*)::int n from engagements where status <> 'complete'"),
-    db.query("select count(*)::int n from engagement_assessments where assessment_status in ('in_progress','submitted')"),
-  ]);
-
-  return {
-    businesses: businesses[0].n,
-    engagements: engagements[0].n,
-    assessments: assessments[0].n,
-    connected: true,
-  };
+ const {data:session}=await auth.getSession();
+ if(!session?.user) throw new Error("Unauthorized");
+ const db=neon(process.env.DATABASE_URL!);
+ const orgs=await db.query('select "organizationId" as id from neon_auth.member where "userId" = $1 limit 1',[session.user.id]);
+ const organizationId=orgs[0]?.id;
+ if(!organizationId) throw new Error("No active BPIP workspace");
+ const [b,e,a]=await Promise.all([
+  db.query("select count(*)::int n from businesses where organization_id = $1 and business_status <> 'archived'",[organizationId]),
+  db.query("select count(*)::int n from engagements where organization_id = $1 and status <> 'complete'",[organizationId]),
+  db.query("select count(*)::int n from engagement_assessments where organization_id = $1 and assessment_status in ('in_progress','submitted')",[organizationId])
+ ]);
+ return {businesses:b[0].n,engagements:e[0].n,assessments:a[0].n,connected:true};
 }
