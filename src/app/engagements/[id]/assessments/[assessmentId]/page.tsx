@@ -10,6 +10,7 @@ import OperationalAssessmentPage from "./operational-page";
 import CommercialAssessmentPage from "./commercial-page";
 import RootCauseAssessmentPage from "./root-cause-page";
 import OpportunityPrioritizationPage from "./prioritization-page";
+import StrategicRecommendationsPage from "./recommendations-page";
 
 export default async function AssessmentRouter({params,searchParams}:{params:Promise<{id:string;assessmentId:string}>;searchParams:Promise<{saved?:string;error?:string;missing?:string}>}) {
  await connection();
@@ -30,6 +31,7 @@ export default async function AssessmentRouter({params,searchParams}:{params:Pro
  if(Number(rows[0].instrument_number)===5) return <CommercialAssessmentPage params={params} searchParams={searchParams}/>;
  if(Number(rows[0].instrument_number)===6) return <RootCauseAssessmentPage params={params} searchParams={searchParams}/>;
  if(Number(rows[0].instrument_number)===7) return <OpportunityPrioritizationPage params={params} searchParams={searchParams}/>;
+ if(Number(rows[0].instrument_number)===8) return <StrategicRecommendationsPage params={params} searchParams={searchParams}/>;
  if(Number(rows[0].instrument_number)===1) return <OwnerDiscoveryPage params={params} searchParams={searchParams}/>;
  notFound();
 }
