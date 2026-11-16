@@ -15,8 +15,9 @@ export default function SignInForm(){
   try{
    const r=await authClient.signIn.emailOtp({email,otp});if(r.error){setError(r.error.message||"Code could not be verified.");return;}
    const orgs=await authClient.organization.list();if(orgs.error){setError("Signed in, but workspace access could not be loaded.");return;}
-   if(orgs.data?.length){await authClient.organization.setActive({organizationId:orgs.data[0].id});}
-   else{const created=await authClient.organization.create({name:"BPIP Advisory",slug:"bpip-advisory"});if(created.error){setError("Signed in, but workspace setup failed. Contact the administrator.");return;}}
+   if(orgs.data?.length){const active=await authClient.organization.setActive({organizationId:orgs.data[0].id});if(active.error){setError("Could not select your workspace.");return;}}
+   else{const created=await authClient.organization.create({name:"BPIP Advisory",slug:"bpip-advisory"});if(created.error){setError("Workspace setup failed. Contact the administrator.");return;}}
+   const boot=await fetch("/api/workspace/bootstrap",{method:"POST"});if(!boot.ok){setError("Your workspace could not be initialized. Contact the administrator.");return;}
    router.replace("/");router.refresh();
   }catch{setError("Sign-in failed. Request a new code.");}finally{setBusy(false);}
  }
