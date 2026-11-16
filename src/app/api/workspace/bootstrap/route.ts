@@ -1,0 +1,17 @@
+import { neon } from "@neondatabase/serverless";
+import { auth } from "@/lib/auth/server";
+
+export async function POST() {
+ const {data:session}=await auth.getSession();
+ if(!session?.user) return Response.json({error:"Unauthorized"},{status:401});
+ const db=neon(process.env.DATABASE_URL!);
+ const existing=await db.query("select organization_id from organization_memberships where user_id = $1 and membership_status = 'active' limit 1",[session.user.id]);
+ if(existing.length) return Response.json({ok:true});
+ const owner=await db.query('select "organizationId" from neon_auth.member where "userId" = $1 and role = $2 limit 1',[session.user.id,"owner"]);
+ if(!owner.length) return Response.json({error:"Workspace owner membership required"},{status:403});
+ await db.query("insert into users(id,email,display_name) values($1,$2,$3) on conflict (id) do update set email=excluded.email,display_name=excluded.display_name",[session.user.id,session.user.email,session.user.name||"BPIP Advisor"]);
+ const slug="bpip-advisory-"+session.user.id.slice(-8).toLowerCase();
+ const org=await db.query("insert into organizations(name,slug,organization_type,subscription_status) values($1,$2,'advisory_firm','internal') on conflict (slug) do update set updated_at=now() returning id",["BPIP Advisory",slug]);
+ await db.query("insert into organization_memberships(organization_id,user_id,role,membership_status) values($1,$2,'organization_owner','active') on conflict (organization_id,user_id) do update set role='organization_owner',membership_status='active'",[org[0].id,session.user.id]);
+ return Response.json({ok:true});
+}
