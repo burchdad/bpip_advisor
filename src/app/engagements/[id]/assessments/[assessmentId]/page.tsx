@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getCurrentOrganization } from "@/lib/tenant";
 import OwnerDiscoveryPage from "./owner-discovery-page";
 import BusinessScorecardPage from "./scorecard-page";
+import FinancialAnalysisPage from "./financial-page";
 
 export default async function AssessmentRouter({params,searchParams}:{params:Promise<{id:string;assessmentId:string}>;searchParams:Promise<{saved?:string;error?:string;missing?:string}>}) {
  await connection();
@@ -20,6 +21,7 @@ export default async function AssessmentRouter({params,searchParams}:{params:Pro
  );
  if(!rows.length) notFound();
  if(Number(rows[0].instrument_number)===2) return <BusinessScorecardPage params={params} searchParams={searchParams}/>;
+ if(Number(rows[0].instrument_number)===3) return <FinancialAnalysisPage params={params} searchParams={searchParams}/>;
  if(Number(rows[0].instrument_number)===1) return <OwnerDiscoveryPage params={params} searchParams={searchParams}/>;
  notFound();
 }
