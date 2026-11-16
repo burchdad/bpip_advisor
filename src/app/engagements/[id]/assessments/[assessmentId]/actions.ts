@@ -25,10 +25,6 @@ export async function saveOwnerDiscovery(formData:FormData) {
  const {db,organizationId,userId,row}=await loadContext(engagementId,assessmentId);
  const schema=row.schema_definition as {sections?:{questions?:{key:string;type:string}[]}[]};
  const allowed=(schema.sections||[]).flatMap(s=>s.questions||[]);
- if(intent==="submit") {
-  const missing=allowed.filter((q:any)=>q.required && !String(formData.get(q.key)||"").trim());
-  if(missing.length) throw new Error("Complete the required fields before marking this questionnaire complete: "+missing.map((q:any)=>q.label).join(", "));
- }
  for(const q of allowed) {
   const raw=formData.get(q.key);
   if(raw===null) continue;
@@ -42,6 +38,12 @@ export async function saveOwnerDiscovery(formData:FormData) {
   );
  }
  if(intent==="submit") {
+  const missing=allowed.filter((q:any)=>q.required && !String(formData.get(q.key)||"").trim());
+  if(missing.length) {
+   await db.query("update engagement_assessments set assessment_status='in_progress',started_at=COALESCE(started_at,now()),completed_at=null,updated_at=now() where id=$1 and organization_id=$2",[assessmentId,organizationId]);
+   const labels=encodeURIComponent(missing.map((q:any)=>q.label).join(" · "));
+   redirect("/engagements/"+engagementId+"/assessments/"+assessmentId+"?error=required&missing="+labels);
+  }
   await db.query("update engagement_assessments set assessment_status='submitted',completed_at=now(),updated_at=now() where id=$1 and organization_id=$2",[assessmentId,organizationId]);
   await db.query("insert into engagement_activity(organization_id,engagement_id,user_id,activity_type,description,metadata) values($1,$2,$3,'assessment_submitted',$4,$5::jsonb)",[organizationId,engagementId,userId,"Owner Discovery Questionnaire marked complete.",JSON.stringify({assessment_id:assessmentId})]);
  } else {
