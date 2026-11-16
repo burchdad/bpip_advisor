@@ -7,6 +7,7 @@ import OwnerDiscoveryPage from "./owner-discovery-page";
 import BusinessScorecardPage from "./scorecard-page";
 import FinancialAnalysisPage from "./financial-page";
 import OperationalAssessmentPage from "./operational-page";
+import CommercialAssessmentPage from "./commercial-page";
 
 export default async function AssessmentRouter({params,searchParams}:{params:Promise<{id:string;assessmentId:string}>;searchParams:Promise<{saved?:string;error?:string;missing?:string}>}) {
  await connection();
@@ -24,6 +25,7 @@ export default async function AssessmentRouter({params,searchParams}:{params:Pro
  if(Number(rows[0].instrument_number)===2) return <BusinessScorecardPage params={params} searchParams={searchParams}/>;
  if(Number(rows[0].instrument_number)===3) return <FinancialAnalysisPage params={params} searchParams={searchParams}/>;
  if(Number(rows[0].instrument_number)===4) return <OperationalAssessmentPage params={params} searchParams={searchParams}/>;
+ if(Number(rows[0].instrument_number)===5) return <CommercialAssessmentPage params={params} searchParams={searchParams}/>;
  if(Number(rows[0].instrument_number)===1) return <OwnerDiscoveryPage params={params} searchParams={searchParams}/>;
  notFound();
 }
