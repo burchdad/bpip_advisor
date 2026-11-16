@@ -5,7 +5,7 @@ export async function getStats() {
  const {data:session}=await auth.getSession();
  if(!session?.user) throw new Error("Unauthorized");
  const db=neon(process.env.DATABASE_URL!);
- const orgs=await db.query('select "organizationId" as id from neon_auth.member where "userId" = $1 limit 1',[session.user.id]);
+ const orgs=await db.query("select organization_id as id from organization_memberships where user_id = $1 and membership_status = 'active' order by created_at asc limit 1",[session.user.id]);
  const organizationId=orgs[0]?.id;
  if(!organizationId) throw new Error("No active BPIP workspace");
  const [b,e,a]=await Promise.all([
