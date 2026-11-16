@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { getCurrentOrganization } from "@/lib/tenant";
 async function loadContext(engagementId:string,assessmentId:string) {
  const {db,organizationId,userId}=await getCurrentOrganization();
- const rows=await db.query(`select ea.id,ea.schema_definition_placeholder,tv.schema_definition from engagement_assessments ea
+ const rows=await db.query(`select ea.id,tv.schema_definition from engagement_assessments ea
  join engagements e on e.id=ea.engagement_id and e.organization_id=ea.organization_id
  join assessment_template_versions tv on tv.id=ea.template_version_id
  join assessment_templates t on t.id=tv.template_id
