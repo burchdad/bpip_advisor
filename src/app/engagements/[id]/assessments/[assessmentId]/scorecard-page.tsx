@@ -2,7 +2,7 @@ import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
 import { getCurrentOrganization } from "@/lib/tenant";
-import { saveBusinessScorecard } from "./actions";
+import { saveBusinessScorecard } from "./scorecard-actions";
 
 export const instant=false;
 type Question={key:string;label:string;type:string;required?:boolean;prompt?:string;options?:string[]};
