@@ -7,7 +7,7 @@ import { saveOwnerDiscovery } from "./actions";
 export const instant=false;
 type Question={key:string;label:string;type:string;required?:boolean;prompt?:string;options?:string[]};
 type Section={id:string;title:string;description?:string;questions:Question[]};
-export default async function OwnerDiscoveryPage({params,searchParams}:{params:Promise<{id:string;assessmentId:string}>;searchParams:Promise<{saved?:string}>}) {
+export default async function OwnerDiscoveryPage({params,searchParams}:{params:Promise<{id:string;assessmentId:string}>;searchParams:Promise<{saved?:string;error?:string;missing?:string}>}) {
  await connection();
  const {id,assessmentId}=await params;
  const query=await searchParams;
@@ -33,7 +33,7 @@ export default async function OwnerDiscoveryPage({params,searchParams}:{params:P
  <div className="assessment-page">
   <a className="back-link" href={"/engagements/"+id}>← Back to engagement</a>
   <div className="assessment-title"><small>{item.business_name} · {item.engagement_name}</small><h1>Owner Discovery Questionnaire</h1><p>{schema.description}</p></div>
-  {query.saved?<div className="assessment-notice">{query.saved==="submitted"?"Questionnaire marked complete. You can still reopen it to review or update responses.":"Your progress has been saved."}</div>:null}
+  {query.saved?<div className="assessment-notice">{query.saved==="submitted"?"Questionnaire marked complete. You can still reopen it to review or update responses.":"Your progress has been saved."}</div>:null}{query.error==="required"?<div className="assessment-error"><b>One required response is still missing.</b><p>{query.missing||"Complete the required field before marking this questionnaire complete."} Your other answers have been saved.</p></div>:null}
   <div className="assessment-progress"><div><b>{answered} of {total}</b><span> questions answered</span></div><div className="progress-track"><i style={{width:(total?answered/total*100:0)+"%"}}/></div></div>
   <div className="assessment-guidance"><b>Advisor guidance</b><p>Capture the owner's perspective in their own words. Responses are initially classified as owner-reported, not independently verified. Record supporting evidence and advisor conclusions in the relevant later instruments.</p></div>
   <form action={saveOwnerDiscovery} className="discovery-form">
