@@ -1,0 +1,2 @@
+const items=["Overview","Businesses","Engagements","Assessments","Opportunities","Reports","Performance"];
+export function Sidebar(){return <aside><div className="logo">BPIP</div><small>BUSINESS INTELLIGENCE</small><hr/><label>WORKSPACE</label>{items.map((x,i)=><div className={i===0?"nav active":"nav"} key={x}>{["◫","▦","▤","◎","✦","▧","◷"][i]}　{x}</div>)}<div className="secure">◆ Private advisor workspace</div></aside>}
