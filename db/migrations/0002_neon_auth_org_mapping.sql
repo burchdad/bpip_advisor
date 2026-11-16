@@ -1,0 +1,2 @@
+ALTER TABLE public.organizations ADD COLUMN IF NOT EXISTS auth_organization_id text;
+CREATE UNIQUE INDEX IF NOT EXISTS organizations_auth_organization_id_uidx ON public.organizations(auth_organization_id) WHERE auth_organization_id IS NOT NULL;
