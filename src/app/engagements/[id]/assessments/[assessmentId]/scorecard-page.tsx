@@ -40,7 +40,6 @@ export default async function BusinessScorecardPage({params,searchParams}:{param
  const contextKeys=[["business_overview","Business overview"],["success_definition","Owner's definition of success"],["priority_objectives","Current priorities"],["revenue_range","Owner-reported annual revenue"],["profitability_view","Owner's profitability view"],["cash_flow_view","Owner's cash-flow view"],["operating_constraints","Owner-identified operating constraints"],["perceived_opportunities","Owner-perceived opportunities"],["key_risks","Owner-identified risks"]];
  const sections=schema.sections||[];
  const total=sections.length;
- const rated=sections.filter(s=>String(answers[(s.id==="financial"?"financial":s.id)+"_rating"]||"").startsWith(["1","2","3","4","5"].find(n=>String(answers[s.id+"_rating"]||"").startsWith(n))||"__")).length;
  const ratings=sections.map(s=>Number(String(answers[s.id+"_rating"]||"").match(/^[1-5]/)?.[0])).filter(n=>Number.isFinite(n));
  const average=ratings.length?ratings.reduce((a,b)=>a+b,0)/ratings.length:null;
  return <main className="shell"><Sidebar/><section><header><a href={"/engagements/"+id}>Engagements</a> / <b>Business Performance Scorecard</b><span>● ADVISOR EDITION</span></header>
