@@ -1,4 +1,6 @@
 import { connection } from "next/server";
+
+export const instant = false;
 import { notFound } from "next/navigation";
 import { getCurrentOrganization } from "@/lib/tenant";
 import OwnerDiscoveryPage from "./owner-discovery-page";
