@@ -55,6 +55,18 @@ export default async function EngagementIntelligencePage({params,searchParams}:{
             {review?<div className="advisor-review-saved"><b>Advisor review recorded</b><p>{review.note}</p><small>Reviewed {fmt(review.reviewed_at)}</small></div>:active.analysis_output?.mode==="TEST_ONLY"?<p className="intelligence-meta">Advisor disposition is disabled for synthetic test data.</p>:<form action={saveAdvisorSignalReview.bind(null,id,active.id,s.id)} className="advisor-review-form"><label>Advisor disposition<select name="disposition" required defaultValue="needs_validation"><option value="needs_validation">Needs further validation</option><option value="supported_for_further_review">Supported for further review</option><option value="not_supported">Not supported by available evidence</option></select></label><label>Review note<textarea name="note" required rows={2} placeholder="Document what was reviewed, what evidence is still needed, or why this signal is not supported." /></label><button className="secondary-button" type="submit">Save advisor review</button></form>}
           </article>;
         }):<p>No deterministic review signals were triggered by the current rules.</p>}
+        <h3>Cross-dimensional patterns</h3>
+        <p className="intelligence-meta">Candidate relationships detected across assessment dimensions. These are not causal findings; validate the cited evidence before using them in an executive conclusion.</p>
+        {(active.analysis_output?.cross_dimension_patterns||[]).length?(active.analysis_output.cross_dimension_patterns||[]).map((pattern:any)=><article className="diagnostic-item cross-pattern-card" key={pattern.id}>
+          <div className="evidence-register-heading"><b>{pattern.title}</b><span>{pattern.status==="TEST_ONLY"?"TEST ONLY":pattern.confidence+" confidence"}</span></div>
+          <small>{(pattern.dimension_links||[]).join(" · ")}</small>
+          <p>{pattern.observation}</p>
+          <p><b>Interpretation:</b> {pattern.interpretation}</p>
+          <p><b>Decision relevance:</b> {pattern.decision_relevance}</p>
+          <div className="cross-pattern-evidence"><b>Source evidence</b>{(pattern.evidence_sources||[]).map((source:any)=><div key={source.question_key}><small>Instrument {source.instrument_number} · {source.label} · {source.evidence_status}</small><p>{source.value}</p></div>)}</div>
+          {(pattern.missing_dependencies||[]).length?<div className="cross-pattern-missing"><b>Missing dependencies</b><ul>{pattern.missing_dependencies.map((missing:any,i:number)=><li key={i}>{missing.question_key}: {missing.reason}</li>)}</ul></div>:null}
+          <div className="cross-pattern-validation"><b>Advisor validation task</b><p>{pattern.validation_task}</p></div>
+        </article>):<p>No cross-dimensional patterns met the current evidence rules. This is not evidence that no relationships exist; required measures may be unavailable.</p>}
         <h3>Evidence gaps</h3>
         {(active.analysis_output?.evidence_gaps||[]).length?(active.analysis_output.evidence_gaps||[]).map((g:any)=><article className="diagnostic-item" key={g.id}><b>{g.title}</b><p>{g.count} item(s) require attention.</p>{g.items?.slice(0,8).map((item:any,i:number)=><small key={i}>• {item.instrument_name||item.dimension||"Evidence"} — {item.label||item.task||item.question_key||"Review required"}</small>)}</article>):<p>No missing-required or placeholder-only fields were identified by this pass.</p>}
         <h3>Validation queue</h3>
