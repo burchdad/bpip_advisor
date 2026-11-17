@@ -41,7 +41,7 @@ export default async function OwnerDiscoveryPage({params,searchParams}:{params:P
   <form action={saveOwnerDiscovery} className="discovery-form">
    <input type="hidden" name="engagement_id" value={id}/><input type="hidden" name="assessment_id" value={assessmentId}/>
    <AssessmentWizard sections={sections.map(s=>({title:s.title,description:s.description,count:s.questions.length,keys:s.questions.map(q=>q.key),answeredKeys:s.questions.filter(q=>String(answers[q.key]??"").trim().length>0).map(q=>q.key),answered:s.questions.filter(q=>String(answers[q.key]??"").trim().length>0).length}))} exitHref={"/engagements/"+id} completeLabel="Mark questionnaire complete">{sections.map((section)=><section className="discovery-section" key={section.id}><div className="discovery-section-heading"><h2>{section.title}</h2>{section.description?<p>{section.description}</p>:null}</div>
-    {section.questions.map(q=><AssessmentQuestion q={q} value={answers[q.key]||""} placeholder="Enter response..."/></section>)}</AssessmentWizard>
+    {section.questions.map(q=><AssessmentQuestion q={q} value={answers[q.key]||""} placeholder="Enter response..."/>)</section>)}</AssessmentWizard>
    
   </form>
  </div><footer>BPIP · Advisor Edition · Confidential workspace</footer></section></main>;
