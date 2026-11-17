@@ -32,7 +32,12 @@ export default async function EngagementIntelligencePage({params,searchParams}:{
   const active=(runs as any[]).find(r=>r.id===activeRunId)||(runs as any[])[0];
   const snapshot=active?.source_snapshot||{};
   const quality=snapshot.data_quality||{};
-  const diagnosticOutput=active?.run_type==="executive_diagnosis"?active.analysis_output||{}:{};\n  const reviewSignals=diagnosticOutput.review_signals||[];\n  const reviewPatterns=diagnosticOutput.cross_dimension_patterns||[];\n  const signalReviews=diagnosticOutput.advisor_review?.signals||[];\n  const patternReviews=diagnosticOutput.advisor_review?.patterns||[];\n  const synthesisReady=reviewSignals.every((s:any)=>signalReviews.some((r:any)=>r.signal_id===s.id))&&reviewPatterns.every((p:any)=>patternReviews.some((r:any)=>r.pattern_id===p.id));
+  const diagnosticOutput=active?.run_type==="executive_diagnosis"?active.analysis_output||{}:{};
+  const reviewSignals=diagnosticOutput.review_signals||[];
+  const reviewPatterns=diagnosticOutput.cross_dimension_patterns||[];
+  const signalReviews=diagnosticOutput.advisor_review?.signals||[];
+  const patternReviews=diagnosticOutput.advisor_review?.patterns||[];
+  const synthesisReady=reviewSignals.every((s:any)=>signalReviews.some((r:any)=>r.signal_id===s.id))&&reviewPatterns.every((p:any)=>patternReviews.some((r:any)=>r.pattern_id===p.id));
   return <main className="shell"><Sidebar/><section><header><a href="/engagements">Engagements</a> / <a href={"/engagements/"+id}>{engagement.engagement_name}</a> / <b>Advisor intelligence</b><span>● ADVISOR EDITION</span></header>
     <div className="engagement-detail intelligence-page">
       <a className="back-link" href={"/engagements/"+id}>← Back to engagement</a>
