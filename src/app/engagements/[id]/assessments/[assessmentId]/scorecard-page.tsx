@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
+import AssessmentWizard from "@/components/assessment-wizard";
 import { getCurrentOrganization } from "@/lib/tenant";
 import { saveBusinessScorecard } from "./scorecard-actions";
 
@@ -54,10 +55,10 @@ export default async function BusinessScorecardPage({params,searchParams}:{param
   </section>
   <form action={saveBusinessScorecard} className="discovery-form">
    <input type="hidden" name="engagement_id" value={id}/><input type="hidden" name="assessment_id" value={assessmentId}/>
-   {sections.map(section=><section className="discovery-section" key={section.id}><div className="discovery-section-heading"><h2>{section.title}</h2><p>{section.description}</p></div>
+   <AssessmentWizard sections={sections.map(s=>({title:s.title,description:s.description,count:s.questions.length,answered:s.questions.filter(q=>String(answers[q.key]??"").trim().length>0).length}))} exitHref={"/engagements/"+id} completeLabel="Complete scorecard">{sections.map(section=><section className="discovery-section" key={section.id}><div className="discovery-section-heading"><h2>{section.title}</h2><p>{section.description}</p></div>
     {section.questions.map(q=><label className="discovery-question" key={q.key}><span>{q.label}{q.required?<em> *</em>:null}</span>{q.type==="select"?<select name={q.key} defaultValue={answers[q.key]||""}><option value="">Select an assessment</option>{(q.options||[]).map(o=><option key={o} value={o}>{o}</option>)}</select>:<textarea name={q.key} rows={3} defaultValue={answers[q.key]||""} placeholder={q.prompt||"Enter advisor assessment..."}/>}{q.prompt?<small>{q.prompt}</small>:null}</label>)}
-   </section>)}
-   <div className="discovery-actions"><a href={"/engagements/"+id}>Exit scorecard</a><button type="submit" name="intent" value="draft" className="secondary-action">Save progress</button><button type="submit" name="intent" value="submit">Complete scorecard</button></div>
+   </section>)}</AssessmentWizard>
+   
   </form>
  </div><footer>BPIP · Advisor Edition · Confidential workspace</footer></section></main>;
 }
