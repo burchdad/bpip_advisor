@@ -85,3 +85,38 @@ header:not(.topbar)>span{float:right}
 .wizard-panel .discovery-question input[type=number]{font-variant-numeric:tabular-nums}
 .wizard-panel .discovery-question textarea{min-height:104px;resize:vertical}
 @media(max-width:920px){.wizard-panel-section[hidden]{display:none!important}}
+
+
+/* Structured answer controls: ratings, evidence confidence and financial inputs */
+.assessment-choice-group{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:0;margin:3px 0 2px;border:0;min-width:0}
+.assessment-choice{position:relative;display:block!important;margin:0!important;padding:0!important;border:0!important;cursor:pointer;min-width:0}
+.assessment-choice>input{position:absolute!important;opacity:0!important;width:1px!important;height:1px!important;min-height:1px!important;pointer-events:none}
+.assessment-choice-card{display:flex;align-items:center;gap:8px;min-height:43px;padding:8px 10px;border:1px solid #dce5eb;border-radius:9px;background:#fbfcfd;color:#4d6174;transition:border-color .15s,background .15s,box-shadow .15s}
+.assessment-choice-card>b{flex:0 0 24px;width:24px;height:24px;display:grid;place-items:center;border-radius:7px;background:#edf2f5;color:#63788b;font-size:11px;font-weight:850}
+.assessment-choice-card>small{font-size:9px;line-height:1.35;color:#607286}
+.assessment-choice input:checked+.assessment-choice-card{border-color:#58aa9a;background:#edf7f4;box-shadow:0 0 0 2px #16857512;color:#145e54}
+.assessment-choice input:checked+.assessment-choice-card>b{background:#d3eee6;color:#126c5d}
+.assessment-choice input:focus-visible+.assessment-choice-card{outline:3px solid #65cbb5;outline-offset:2px}
+.assessment-choice:hover .assessment-choice-card{border-color:#9fcac0}
+.assessment-choice-clear .assessment-choice-card{border-style:dashed;background:#fff}
+.assessment-choice-group.is-evidence{grid-template-columns:repeat(2,minmax(0,1fr))}
+.assessment-choice-group.is-evidence .assessment-choice-card{min-height:52px}
+.assessment-choice-group.is-evidence .assessment-choice-card>b{flex:0 0 auto;width:auto;height:auto;display:block;background:transparent;color:#36566a;font-size:9px}
+.assessment-number-wrap{display:flex;align-items:center;gap:0;width:100%;border:1px solid #dce4eb;border-radius:8px;background:#fbfcfd;overflow:hidden}
+.assessment-number-wrap:focus-within{border-color:#57a99b;box-shadow:0 0 0 3px #16857518}
+.assessment-number-wrap input{border:0!important;box-shadow:none!important;background:transparent!important;min-width:0;flex:1}
+.assessment-number-unit{padding:0 11px;color:#718396;font-size:10px;font-weight:750;white-space:nowrap}
+.assessment-number-unit.is-prefix{order:0;border-right:1px solid #e6edf1}
+.assessment-number-unit.is-suffix{order:2;border-left:1px solid #e6edf1}
+.assessment-number-wrap input{order:1}
+.financial-metric-section .discovery-question{background:#f9fbfc;border:1px solid #e8eef2!important;border-radius:9px;padding:12px!important;margin:0!important}
+.financial-metric-section .discovery-question>span{font-size:10px}
+.financial-metric-section .discovery-question:has(textarea){grid-column:1/-1}
+.financial-metric-section .discovery-question textarea{min-height:88px}
+.financial-metric-section .wizard-panel-section>.discovery-section>div:not(.discovery-section-heading){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.opportunity-editor .discovery-question{background:#fbfcfd;border:1px solid #e8eef2!important;border-radius:9px;padding:11px!important;margin:0!important}
+.opportunity-editor .discovery-question:has(textarea){grid-column:1/-1}
+.opportunity-editor .assessment-choice-group{grid-template-columns:repeat(3,minmax(0,1fr))}
+.opportunity-editor .assessment-choice-card{min-height:39px;padding:6px}
+.opportunity-editor .assessment-choice-card>b{width:21px;height:21px;flex-basis:21px}
+@media(max-width:700px){.assessment-choice-group{grid-template-columns:repeat(2,minmax(0,1fr))}.assessment-choice-group.is-rating .assessment-choice-card{min-height:40px}.financial-metric-section .wizard-panel-section>.discovery-section>div:not(.discovery-section-heading){grid-template-columns:1fr}.financial-metric-section .discovery-question:has(textarea){grid-column:auto}.opportunity-editor .assessment-choice-group{grid-template-columns:repeat(2,minmax(0,1fr))}}
