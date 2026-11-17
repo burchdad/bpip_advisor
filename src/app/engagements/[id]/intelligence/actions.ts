@@ -106,3 +106,28 @@ export async function createEvidenceSnapshot(engagementId:string){
   );
   redirect(`/engagements/${engagementId}/intelligence?run=${inserted[0].id}`);
 }
+
+import { buildDeterministicDiagnosis } from "@/lib/intelligence/diagnostic";
+
+export async function generateDeterministicDiagnosis(engagementId:string,sourceRunId:string){
+  const {db,organizationId,userId}=await getCurrentOrganization();
+  const sourceRows=await db.query(
+    `select id,source_snapshot,source_assessment_count,source_response_count
+     from engagement_intelligence_runs
+     where id=$1 and engagement_id=$2 and organization_id=$3 and run_type='evidence_synthesis'
+     limit 1`,
+    [sourceRunId,engagementId,organizationId]
+  );
+  if(!sourceRows.length)redirect("/engagements/"+engagementId+"/intelligence");
+  const source=sourceRows[0] as any;
+  const output=buildDeterministicDiagnosis(source.source_snapshot,sourceRunId);
+  const inserted=await db.query(
+    `insert into engagement_intelligence_runs
+      (organization_id,engagement_id,run_type,run_status,source_snapshot,analysis_output,
+       source_assessment_count,source_response_count,prompt_version,model_provider,model_id,created_by)
+     values ($1,$2,'executive_diagnosis','generated',$3::jsonb,$4::jsonb,$5,$6,'diagnostic-v1','deterministic','rules-engine-v1',$7)
+     returning id`,
+    [organizationId,engagementId,JSON.stringify(source.source_snapshot),JSON.stringify(output),source.source_assessment_count,source.source_response_count,userId]
+  );
+  redirect("/engagements/"+engagementId+"/intelligence?run="+inserted[0].id);
+}
