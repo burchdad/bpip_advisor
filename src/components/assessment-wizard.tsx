@@ -1,8 +1,8 @@
 "use client";
-import { Children, useMemo, useState } from "react";
+import { Children, useMemo, useState, type ReactNode } from "react";
 
 type Step={title:string;description?:string;count:number;answered:number};
-export default function AssessmentWizard({sections,children,exitHref,completeLabel="Complete assessment"}:{sections:Step[];children:React.ReactNode;exitHref:string;completeLabel?:string}){
+export default function AssessmentWizard({sections,children,exitHref,completeLabel="Complete assessment"}:{sections:Step[];children:ReactNode;exitHref:string;completeLabel?:string}){
  const [active,setActive]=useState(0);
  const [visited,setVisited]=useState<number[]>([0]);
  const panels=Children.toArray(children);
