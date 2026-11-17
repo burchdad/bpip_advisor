@@ -215,7 +215,7 @@ export async function generateExecutiveSynthesis(engagementId:string,diagnosisRu
   const {db,organizationId,userId}=await getCurrentOrganization();
   if(formData.get("client_ai_authorized")!=="yes")redirect("/engagements/"+engagementId+"/intelligence?run="+diagnosisRunId+"&synthesis=consent");
   const rows=await db.query(
-    `select id,run_type,run_status,source_snapshot,analysis_output,source_assessment_count,source_response_count
+    `select id,run_type,run_status,source_snapshot,analysis_output,source_assessment_count,source_response_count,updated_at
      from engagement_intelligence_runs
      where id=$1 and engagement_id=$2 and organization_id=$3 and run_type='executive_diagnosis'
      limit 1`,
@@ -294,7 +294,7 @@ Rules:
     const summary=validateSynthesisClaim(parsed.executive_summary,sourceIndex);
     const validateList=(items:any[])=>Array.isArray(items)?items.map(item=>validateSynthesisClaim(item,sourceIndex)).filter(Boolean):[];
     const output={
-      synthesis_version:"executive-synthesis-v1",generated_at:new Date().toISOString(),source_diagnosis_run_id:diagnosisRunId,model:"openai/gpt-5.4-mini",
+      synthesis_version:"executive-synthesis-v1",generated_at:new Date().toISOString(),source_diagnosis_run_id:diagnosisRunId,source_diagnosis_updated_at:diagnosis.updated_at,model:"openai/gpt-5.4-mini",
       executive_summary:summary,key_observations:validateList(parsed.key_observations),
       cross_dimensional_synthesis:validateList(parsed.cross_dimensional_synthesis).filter((item:any)=>{
         const matched=patterns.find((p:any)=>(item.evidence_refs||[]).some((ref:string)=>(p.evidence_sources||[]).some((s:any)=>ref==="I"+s.instrument_number+":"+s.question_key)));
@@ -344,6 +344,16 @@ export async function approveExecutiveSynthesis(engagementId:string,runId:string
   if(run.run_status!=="generated")redirect("/engagements/"+engagementId+"/intelligence?run="+runId+"&approval=locked");
   const output=run.analysis_output||{};
   if(output.integrity?.synthetic_data_detected||output.citation_validation?.all_rendered_citations_verified!==true||!output.executive_summary?.evidence_refs?.length){
+    redirect("/engagements/"+engagementId+"/intelligence?run="+runId+"&approval=integrity");
+  }
+  const outputDiagnosisId=output.source_diagnosis_run_id;
+  const sourceDiagnosisRows=outputDiagnosisId?await db.query(
+    `select id,updated_at from engagement_intelligence_runs
+     where id=$1 and engagement_id=$2 and organization_id=$3 and run_type='executive_diagnosis'
+     limit 1`,
+    [outputDiagnosisId,engagementId,organizationId]
+  ):[];
+  if(!sourceDiagnosisRows.length||new Date((sourceDiagnosisRows[0] as any).updated_at).getTime()!==new Date(output.source_diagnosis_updated_at).getTime()){
     redirect("/engagements/"+engagementId+"/intelligence?run="+runId+"&approval=integrity");
   }
   const snapshot=run.source_snapshot||{};
