@@ -26,3 +26,13 @@
 .intelligence-json summary{cursor:pointer;font-weight:650}
 .intelligence-json pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:560px;overflow:auto;font-size:11px;line-height:1.5;margin-top:14px}
 .intelligence-empty{padding:28px}
+
+.evidence-register-instrument{margin-top:20px}
+.evidence-register-instrument h3{font-size:15px;margin:18px 0 8px}
+.evidence-register-row{padding:14px 0;border-top:1px solid var(--line,#e4e7ec)}
+.evidence-register-heading{display:flex;justify-content:space-between;gap:14px;align-items:baseline}
+.evidence-register-heading b{font-size:13px}
+.evidence-register-heading span,.evidence-register-section{font-size:11px;color:var(--muted,#667085)}
+.evidence-register-row p{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.55;margin:8px 0;color:var(--foreground,#344054)}
+.evidence-register-meta{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:var(--muted,#667085)}
+.evidence-register-meta span:last-child{font-weight:650}
