@@ -27,7 +27,7 @@ export default async function RootCauseAssessmentPage({params,searchParams}:{par
  <div className="assessment-guidance"><b>Root-cause analysis principles</b><p>Do not confuse symptoms with causes or correlation with causation. Connect each finding to evidence from Instruments 1–5 and source records. Keep verified facts, owner/employee reports, advisor hypotheses and conclusions distinct. Test alternative explanations. Do not invent financial impact or savings estimates. Consider customer and employee effects, implementation capacity, dependencies and risk.</p></div>
  <form action={saveRootCauseAssessment} className="discovery-form"><input type="hidden" name="engagement_id" value={id}/><input type="hidden" name="assessment_id" value={assessmentId}/>
  <AssessmentWizard sections={sections.map(s=>({title:s.title,description:s.description,count:s.questions.length,keys:s.questions.map(q=>q.key),answeredKeys:s.questions.filter(q=>String(answers[q.key]??"").trim().length>0).map(q=>q.key),answered:s.questions.filter(q=>String(answers[q.key]??"").trim().length>0).length}))} exitHref={"/engagements/"+id} completeLabel="Complete assessment">{sections.map(section=><section className="discovery-section" key={section.id}><div className="discovery-section-heading"><h2>{section.title}</h2><p>{section.description}</p></div>
- {section.questions.map(q=><AssessmentQuestion key={q.key} q={q} value={answers[q.key]||""} placeholder="Enter response..."/>)</section>)}</AssessmentWizard>
+ {section.questions.map(q=><AssessmentQuestion key={q.key} q={q} value={answers[q.key]||""} placeholder="Enter response..."/>)} </section>)}</AssessmentWizard>
  
  </form></div><footer>BPIP · Advisor Edition · Confidential workspace</footer></section></main>;
 }
