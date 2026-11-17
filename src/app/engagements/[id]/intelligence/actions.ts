@@ -131,3 +131,37 @@ export async function generateDeterministicDiagnosis(engagementId:string,sourceR
   );
   redirect("/engagements/"+engagementId+"/intelligence?run="+inserted[0].id);
 }
+
+export async function saveAdvisorSignalReview(engagementId:string,runId:string,signalId:string,formData:FormData){
+  const {db,organizationId,userId}=await getCurrentOrganization();
+  const disposition=String(formData.get("disposition")||"");
+  const note=String(formData.get("note")||"").trim();
+  const allowed=["needs_validation","supported_for_further_review","not_supported"];
+  if(!allowed.includes(disposition)||!note)redirect("/engagements/"+engagementId+"/intelligence?run="+runId+"&review=invalid");
+  const rows=await db.query(
+    `select id,run_status,analysis_output
+     from engagement_intelligence_runs
+     where id=$1 and engagement_id=$2 and organization_id=$3 and run_type='executive_diagnosis'
+     limit 1`,
+    [runId,engagementId,organizationId]
+  );
+  if(!rows.length)redirect("/engagements/"+engagementId+"/intelligence");
+  const run=rows[0] as any;
+  const output=run.analysis_output||{};
+  if(output.mode==="TEST_ONLY")redirect("/engagements/"+engagementId+"/intelligence?run="+runId+"&review=blocked");
+  const signal=(output.review_signals||[]).find((s:any)=>s.id===signalId);
+  if(!signal)redirect("/engagements/"+engagementId+"/intelligence?run="+runId);
+  const reviews=output.advisor_review?.signals||[];
+  const review={signal_id:signalId,disposition,note,reviewed_by:userId,reviewed_at:new Date().toISOString()};
+  const nextReviews=[...reviews.filter((r:any)=>r.signal_id!==signalId),review];
+  const nextOutput={...output,advisor_review:{...(output.advisor_review||{}),signals:nextReviews,last_reviewed_at:review.reviewed_at}};
+  const remaining=(output.review_signals||[]).filter((s:any)=>!nextReviews.some((r:any)=>r.signal_id===s.id));
+  const nextStatus=remaining.length===0?"advisor_reviewed":"generated";
+  await db.query(
+    `update engagement_intelligence_runs
+     set analysis_output=$1::jsonb,run_status=$2,reviewed_by=$3,reviewed_at=now(),updated_at=now()
+     where id=$4 and engagement_id=$5 and organization_id=$6`,
+    [JSON.stringify(nextOutput),nextStatus,userId,runId,engagementId,organizationId]
+  );
+  redirect("/engagements/"+engagementId+"/intelligence?run="+runId);
+}
