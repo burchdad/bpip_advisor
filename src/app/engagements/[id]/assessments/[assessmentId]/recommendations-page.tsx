@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
+import AssessmentWizard from "@/components/assessment-wizard";
 import { getCurrentOrganization } from "@/lib/tenant";
 import { saveStrategicRoadmap } from "./recommendations-actions";
 export const instant=false;
@@ -29,8 +30,8 @@ export default async function StrategicRecommendationsPage({params,searchParams}
  {opportunities.length?<div className="assessment-guidance"><b>Prioritized opportunities from Instrument 7</b><p>Use these as inputs—not automatic recommendations. Confirm the diagnosis, feasibility, owner alignment, dependencies and capacity before committing to an initiative.</p>{opportunities.map(o=><div key={o.n}><b>{o.name}</b> · {o.score===null?"Not fully scored":o.score+"/100"}</div>)}</div>:<div className="assessment-guidance"><b>Upstream dependency</b><p>Instrument 7 has not yet supplied saved opportunity names. You can continue drafting recommendations, but complete the prioritization model before finalizing the sequence.</p></div>}
  <div className="assessment-guidance"><b>Recommendation and roadmap standards</b><p>Every recommendation should trace to a diagnosed cause and evidence. Separate expected outcomes from approved targets and realized benefits. Assign accountable owners, resources, decision gates and measures. Management owns execution; the advisor recommends and monitors; the business owner retains decision authority. Consider customer and employee impact and implementation capacity.</p></div>
  <form action={saveStrategicRoadmap} className="discovery-form"><input type="hidden" name="engagement_id" value={id}/><input type="hidden" name="assessment_id" value={assessmentId}/>
- {sections.map(section=><section className="discovery-section" key={section.id}><div className="discovery-section-heading"><h2>{section.title}</h2><p>{section.description}</p></div>{section.questions.map(q=><label className="discovery-question" key={q.key}><span>{q.label}{q.required?<em> *</em>:null}</span>
+ <AssessmentWizard sections={sections.map(s=>({title:s.title,description:s.description,count:s.questions.length,answered:s.questions.filter(q=>String(answers[q.key]??"").trim().length>0).length}))} exitHref={"/engagements/"+id} completeLabel="Complete assessment">{sections.map(section=><section className="discovery-section" key={section.id}><div className="discovery-section-heading"><h2>{section.title}</h2><p>{section.description}</p></div>{section.questions.map(q=><label className="discovery-question" key={q.key}><span>{q.label}{q.required?<em> *</em>:null}</span>
  {q.type==="select"?<select name={q.key} defaultValue={answers[q.key]||""}><option value="">Select an option</option>{(q.options||[]).map(o=><option key={o} value={o}>{o}</option>)}</select>:q.type==="text"?<input type="text" name={q.key} defaultValue={answers[q.key]||""} placeholder={q.prompt||"Enter response..."}/>:<textarea name={q.key} rows={3} defaultValue={answers[q.key]||""} placeholder={q.prompt||"Enter recommendation or plan..."}/>}
- </label>)}</section>)}
- <div className="discovery-actions"><a href={"/engagements/"+id}>Exit assessment</a><button type="submit" name="intent" value="draft" className="secondary-action">Save progress</button><button type="submit" name="intent" value="submit">Complete assessment</button></div></form></div><footer>BPIP · Advisor Edition · Confidential workspace</footer></section></main>;
+ </label>)}</section>)}</AssessmentWizard>
+ </form></div><footer>BPIP · Advisor Edition · Confidential workspace</footer></section></main>;
 }
