@@ -174,7 +174,8 @@ export function buildDeterministicDiagnosis(snapshot:any,sourceRunId:string){
       "This engine uses deterministic rules only; no language model generated or inferred conclusions.",
       "A low advisor rating is a prompt for evidence review, not proof of poor performance.",
       "Missing or placeholder values are data-quality gaps, not evidence of weak performance.",
-      "Cross-dimensional patterns are candidate relationships for advisor validation, not causal findings.",\n      "No root cause, financial impact, ROI, forecast, or recommendation is established by this output.",
+      "Cross-dimensional patterns are candidate relationships for advisor validation, not causal findings.",
+      "No root cause, financial impact, ROI, forecast, or recommendation is established by this output.",
       testMode?"TEST MODE: synthetic/test material prevents use as actual business evidence.":"Advisor must validate every signal against its cited source records before approval."
     ]
   };
