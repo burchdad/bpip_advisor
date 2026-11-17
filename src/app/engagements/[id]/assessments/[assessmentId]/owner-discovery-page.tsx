@@ -2,6 +2,7 @@ import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
 import AssessmentWizard from "@/components/assessment-wizard";
+import AssessmentQuestion from "@/components/assessment-question";
 import { getCurrentOrganization } from "@/lib/tenant";
 import { saveOwnerDiscovery } from "./actions";
 
@@ -40,8 +41,7 @@ export default async function OwnerDiscoveryPage({params,searchParams}:{params:P
   <form action={saveOwnerDiscovery} className="discovery-form">
    <input type="hidden" name="engagement_id" value={id}/><input type="hidden" name="assessment_id" value={assessmentId}/>
    <AssessmentWizard sections={sections.map(s=>({title:s.title,description:s.description,count:s.questions.length,keys:s.questions.map(q=>q.key),answeredKeys:s.questions.filter(q=>String(answers[q.key]??"").trim().length>0).map(q=>q.key),answered:s.questions.filter(q=>String(answers[q.key]??"").trim().length>0).length}))} exitHref={"/engagements/"+id} completeLabel="Mark questionnaire complete">{sections.map((section)=><section className="discovery-section" key={section.id}><div className="discovery-section-heading"><h2>{section.title}</h2>{section.description?<p>{section.description}</p>:null}</div>
-    {section.questions.map((q)=><label className="discovery-question" key={q.key}><span>{q.label}{q.required?<em> *</em>:null}</span>{q.type==="select"?<select name={q.key} defaultValue={answers[q.key]||""}><option value="">Select an answer</option>{(q.options||[]).map(o=><option key={o} value={o}>{o}</option>)}</select>:<textarea name={q.key} rows={q.type==="textarea"?3:1} defaultValue={answers[q.key]||""} placeholder={q.prompt||"Enter response..."} />}{q.prompt?<small>{q.prompt}</small>:null}</label>)}
-   </section>)}</AssessmentWizard>
+    {section.questions.map(q=><AssessmentQuestion q={q} value={answers[q.key]||""} placeholder="Enter response..."/></section>)}</AssessmentWizard>
    
   </form>
  </div><footer>BPIP · Advisor Edition · Confidential workspace</footer></section></main>;
