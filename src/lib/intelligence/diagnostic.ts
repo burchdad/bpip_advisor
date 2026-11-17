@@ -39,7 +39,7 @@ function buildCrossDimensionPatterns(assessments:SnapshotAssessment[], byKey:Map
     return "Limited";
   };
   const patterns:any[]=[];
-  const add=(id:string,title:string,dimension_links:string[],keys:string[],why:string,missing:string[],task:string,impact:string)=>{
+  const add=(id:string,title:string,dimension_links:string[],keys:string[],why:string,missing:any[],task:string,impact:string)=>{
     const sources=source(keys);
     if(sources.length<2||new Set(sources.map(s=>s.instrument_number)).size<2)return;
     patterns.push({id,title,pattern_type:"cross_dimension_candidate",dimension_links,observation:why,interpretation:"This is a relationship worth testing, not proof of causation or a confirmed performance problem.",confidence:confidence(sources),evidence_sources:sources,missing_dependencies:missing,validation_task:task,decision_relevance:impact,status:testMode||sources.some(s=>s.synthetic_marker_detected)?"TEST_ONLY":"ADVISOR_VALIDATION_REQUIRED",source_instruments:[...new Set(sources.map(s=>s.instrument_number))]});
