@@ -52,3 +52,11 @@
 .advisor-review-saved{margin-top:12px;padding:12px;border-left:3px solid var(--accent,#667085);background:var(--surface-subtle,#f8fafc);font-size:13px}
 .advisor-review-saved p{margin:6px 0}
 .advisor-review-saved small{color:var(--muted,#667085)}
+
+.cross-pattern-card{padding:16px 0}
+.cross-pattern-evidence,.cross-pattern-missing,.cross-pattern-validation{margin-top:12px;padding:12px;border:1px solid var(--line,#e4e7ec);border-radius:9px;background:var(--surface-subtle,#f8fafc)}
+.cross-pattern-evidence>div{padding:9px 0;border-top:1px solid var(--line,#e4e7ec);margin-top:8px}
+.cross-pattern-evidence p,.cross-pattern-missing li,.cross-pattern-validation p{font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.cross-pattern-evidence small{font-size:10px;color:var(--muted,#667085)}
+.cross-pattern-missing ul{padding-left:18px;margin-bottom:0}
+.cross-pattern-validation{border-left:3px solid var(--accent,#667085)}
