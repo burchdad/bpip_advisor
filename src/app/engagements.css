@@ -36,3 +36,11 @@
 .evidence-register-row p{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.55;margin:8px 0;color:var(--foreground,#344054)}
 .evidence-register-meta{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:var(--muted,#667085)}
 .evidence-register-meta span:last-child{font-weight:650}
+
+.intelligence-action-form{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:14px 0}
+.intelligence-action-form small{font-size:12px;color:var(--muted,#667085)}
+.diagnostic-panel h3{font-size:15px;margin:22px 0 10px}
+.diagnostic-item{padding:13px 0;border-top:1px solid var(--line,#e4e7ec)}
+.diagnostic-item p{font-size:13px;line-height:1.5;margin:7px 0}
+.diagnostic-item small{display:block;color:var(--muted,#667085);font-size:11px;margin-top:5px}
+.diagnostic-panel ul{padding-left:20px;font-size:13px;line-height:1.6}
