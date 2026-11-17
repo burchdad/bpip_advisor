@@ -4,7 +4,6 @@ import { Children, useEffect, useMemo, useState, type ReactNode, type ChangeEven
 type Step={title:string;description?:string;count:number;answered:number;keys:string[];answeredKeys:string[]};
 export default function AssessmentWizard({sections,children,exitHref,completeLabel="Complete assessment"}:{sections:Step[];children:ReactNode;exitHref:string;completeLabel?:string}){
  const [active,setActive]=useState(0);
- const [visited,setVisited]=useState<number[]>([0]);
  const [liveAnswers,setLiveAnswers]=useState<Record<string,boolean>>(()=>Object.fromEntries(sections.flatMap(s=>s.keys.map(k=>[k,s.answeredKeys.includes(k)]))));
  const [dirty,setDirty]=useState(false);
  const panels=Children.toArray(children);
@@ -12,7 +11,7 @@ export default function AssessmentWizard({sections,children,exitHref,completeLab
  const answered=sections.reduce((n,s)=>n+s.answered,0);
  const current=liveSections[active];
  const progress=total?Math.round(answered/total*100):0;
- const go=(next:number)=>{const safe=Math.max(0,Math.min(sections.length-1,next));setActive(safe);setVisited(v=>v.includes(safe)?v:[...v,safe]);};
+ const go=(next:number)=>{const safe=Math.max(0,Math.min(sections.length-1,next));setActive(safe);};
  const completion=liveSections.map(s=>s.count?Math.round(s.answered/s.count*100):0);\n const handleChange=(event:ChangeEvent<HTMLDivElement>)=>{const target=event.target as HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement;if(!target.name)return;const value=target instanceof HTMLInputElement&&target.type==="checkbox"?target.checked:String(target.value).trim().length>0;setLiveAnswers(prev=>({...prev,[target.name]:value}));setDirty(true);};\n useEffect(()=>{if(!dirty)return;const warn=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue="";};window.addEventListener("beforeunload",warn);return()=>window.removeEventListener("beforeunload",warn);},[dirty]);
  return <div className="assessment-wizard" onChange={handleChange}>
   <div className="wizard-overview">
