@@ -5,6 +5,7 @@ import { getCurrentOrganization } from "@/lib/tenant";
 import { createEvidenceSnapshot, generateDeterministicDiagnosis, saveAdvisorSignalReview, saveAdvisorPatternReview, generateExecutiveSynthesis } from "./actions";
 
 export const instant=false;
+export const maxDuration=60;
 
 const fmt=(value:unknown)=>value?new Date(value as string).toLocaleString("en-US"):"—";
 
