@@ -44,3 +44,11 @@
 .diagnostic-item p{font-size:13px;line-height:1.5;margin:7px 0}
 .diagnostic-item small{display:block;color:var(--muted,#667085);font-size:11px;margin-top:5px}
 .diagnostic-panel ul{padding-left:20px;font-size:13px;line-height:1.6}
+
+.advisor-review-form{display:grid;gap:10px;margin-top:14px;padding:14px;border:1px solid var(--line,#e4e7ec);border-radius:10px;background:var(--surface-subtle,#f8fafc)}
+.advisor-review-form label{display:grid;gap:6px;font-size:12px;font-weight:650}
+.advisor-review-form select,.advisor-review-form textarea{width:100%;border:1px solid var(--line,#d0d5dd);border-radius:7px;padding:9px;background:var(--surface,#fff);color:inherit;font:inherit;font-weight:400}
+.advisor-review-form textarea{resize:vertical}
+.advisor-review-saved{margin-top:12px;padding:12px;border-left:3px solid var(--accent,#667085);background:var(--surface-subtle,#f8fafc);font-size:13px}
+.advisor-review-saved p{margin:6px 0}
+.advisor-review-saved small{color:var(--muted,#667085)}
