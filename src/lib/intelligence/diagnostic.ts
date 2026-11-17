@@ -135,7 +135,8 @@ export function buildDeterministicDiagnosis(snapshot:any,sourceRunId:string){
       });
     }
   }
-  const crossDimensionPatterns=buildCrossDimensionPatterns(assessments,byKey,testMode);\n  const gaps:any[]=[];
+  const crossDimensionPatterns=buildCrossDimensionPatterns(assessments,byKey,testMode);
+  const gaps:any[]=[];
   if(missingRequired.length)gaps.push({id:"required-gaps",title:"Required assessment fields missing or placeholder-only",count:missingRequired.length,items:missingRequired.slice(0,30)});
   if(placeholderAnswers.length)gaps.push({id:"placeholder-answers",title:"Populated fields contain placeholder values",count:placeholderAnswers.length,items:placeholderAnswers.slice(0,30)});
   if((quality.unclassified_response_records||0)>0)gaps.push({id:"unclassified",title:"Evidence classifications missing",count:quality.unclassified_response_records});
