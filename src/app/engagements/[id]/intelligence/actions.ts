@@ -155,8 +155,46 @@ export async function saveAdvisorSignalReview(engagementId:string,runId:string,s
   const review={signal_id:signalId,disposition,note,reviewed_by:userId,reviewed_at:new Date().toISOString()};
   const nextReviews=[...reviews.filter((r:any)=>r.signal_id!==signalId),review];
   const nextOutput={...output,advisor_review:{...(output.advisor_review||{}),signals:nextReviews,last_reviewed_at:review.reviewed_at}};
-  const remaining=(output.review_signals||[]).filter((s:any)=>!nextReviews.some((r:any)=>r.signal_id===s.id));
-  const nextStatus=remaining.length===0?"advisor_reviewed":"generated";
+  const remainingSignals=(output.review_signals||[]).filter((s:any)=>!nextReviews.some((r:any)=>r.signal_id===s.id));
+  const patternReviews=output.advisor_review?.patterns||[];
+  const remainingPatterns=(output.cross_dimension_patterns||[]).filter((p:any)=>!patternReviews.some((r:any)=>r.pattern_id===p.id));
+  const nextStatus=remainingSignals.length===0&&remainingPatterns.length===0?"advisor_reviewed":"generated";
+  await db.query(
+    `update engagement_intelligence_runs
+     set analysis_output=$1::jsonb,run_status=$2,reviewed_by=$3,reviewed_at=now(),updated_at=now()
+     where id=$4 and engagement_id=$5 and organization_id=$6`,
+    [JSON.stringify(nextOutput),nextStatus,userId,runId,engagementId,organizationId]
+  );
+  redirect("/engagements/"+engagementId+"/intelligence?run="+runId);
+}
+
+export async function saveAdvisorPatternReview(engagementId:string,runId:string,patternId:string,formData:FormData){
+  const {db,organizationId,userId}=await getCurrentOrganization();
+  const disposition=String(formData.get("disposition")||"");
+  const note=String(formData.get("note")||"").trim();
+  const allowed=["needs_validation","supported_for_further_review","not_supported"];
+  if(!allowed.includes(disposition)||!note)redirect("/engagements/"+engagementId+"/intelligence?run="+runId+"&review=invalid");
+  const rows=await db.query(
+    `select id,run_status,analysis_output
+     from engagement_intelligence_runs
+     where id=$1 and engagement_id=$2 and organization_id=$3 and run_type='executive_diagnosis'
+     limit 1`,
+    [runId,engagementId,organizationId]
+  );
+  if(!rows.length)redirect("/engagements/"+engagementId+"/intelligence");
+  const run=rows[0] as any;
+  const output=run.analysis_output||{};
+  if(output.mode==="TEST_ONLY")redirect("/engagements/"+engagementId+"/intelligence?run="+runId+"&review=blocked");
+  const pattern=(output.cross_dimension_patterns||[]).find((p:any)=>p.id===patternId);
+  if(!pattern||pattern.status==="TEST_ONLY")redirect("/engagements/"+engagementId+"/intelligence?run="+runId);
+  const reviews=output.advisor_review?.patterns||[];
+  const review={pattern_id:patternId,disposition,note,reviewed_by:userId,reviewed_at:new Date().toISOString()};
+  const nextReviews=[...reviews.filter((r:any)=>r.pattern_id!==patternId),review];
+  const nextOutput={...output,advisor_review:{...(output.advisor_review||{}),patterns:nextReviews,last_reviewed_at:review.reviewed_at}};
+  const signalReviews=output.advisor_review?.signals||[];
+  const remainingSignals=(output.review_signals||[]).filter((s:any)=>!signalReviews.some((r:any)=>r.signal_id===s.id));
+  const remainingPatterns=(output.cross_dimension_patterns||[]).filter((p:any)=>!nextReviews.some((r:any)=>r.pattern_id===p.id));
+  const nextStatus=remainingSignals.length===0&&remainingPatterns.length===0?"advisor_reviewed":"generated";
   await db.query(
     `update engagement_intelligence_runs
      set analysis_output=$1::jsonb,run_status=$2,reviewed_by=$3,reviewed_at=now(),updated_at=now()
