@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
+import AssessmentWizard from "@/components/assessment-wizard";
 import { getCurrentOrganization } from "@/lib/tenant";
 import { saveOwnerDiscovery } from "./actions";
 
@@ -38,10 +39,10 @@ export default async function OwnerDiscoveryPage({params,searchParams}:{params:P
   <div className="assessment-guidance"><b>Advisor guidance</b><p>Capture the owner's perspective in their own words. Responses are initially classified as owner-reported, not independently verified. Record supporting evidence and advisor conclusions in the relevant later instruments.</p></div>
   <form action={saveOwnerDiscovery} className="discovery-form">
    <input type="hidden" name="engagement_id" value={id}/><input type="hidden" name="assessment_id" value={assessmentId}/>
-   {sections.map((section)=><section className="discovery-section" key={section.id}><div className="discovery-section-heading"><h2>{section.title}</h2>{section.description?<p>{section.description}</p>:null}</div>
+   <AssessmentWizard sections={sections.map(s=>({title:s.title,description:s.description,count:s.questions.length,answered:s.questions.filter(q=>String(answers[q.key]??"").trim().length>0).length}))} exitHref={"/engagements/"+id} completeLabel="Mark questionnaire complete">{sections.map((section)=><section className="discovery-section" key={section.id}><div className="discovery-section-heading"><h2>{section.title}</h2>{section.description?<p>{section.description}</p>:null}</div>
     {section.questions.map((q)=><label className="discovery-question" key={q.key}><span>{q.label}{q.required?<em> *</em>:null}</span>{q.type==="select"?<select name={q.key} defaultValue={answers[q.key]||""}><option value="">Select an answer</option>{(q.options||[]).map(o=><option key={o} value={o}>{o}</option>)}</select>:<textarea name={q.key} rows={q.type==="textarea"?3:1} defaultValue={answers[q.key]||""} placeholder={q.prompt||"Enter response..."} />}{q.prompt?<small>{q.prompt}</small>:null}</label>)}
-   </section>)}
-   <div className="discovery-actions"><a href={"/engagements/"+id}>Exit questionnaire</a><button type="submit" name="intent" value="draft" className="secondary-action">Save progress</button><button type="submit" name="intent" value="submit">Mark questionnaire complete</button></div>
+   </section>)}</AssessmentWizard>
+   
   </form>
  </div><footer>BPIP · Advisor Edition · Confidential workspace</footer></section></main>;
 }
