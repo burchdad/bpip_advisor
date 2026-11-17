@@ -73,3 +73,36 @@
 .synthesis-citations{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .synthesis-citations span{display:inline-block;padding:5px 8px;border:1px solid var(--line,#e4e7ec);border-radius:6px;font-size:10px;color:var(--muted,#667085);background:var(--surface,#fff)}
 .executive-synthesis-panel .diagnostic-item{margin-top:10px}
+
+.report-kicker{font-size:9px;letter-spacing:1.5px;font-weight:800;color:#55cbb0;margin-bottom:8px}
+.report-intro{font-size:11px;color:#91a2b4;line-height:1.65;margin:0 0 16px}
+.report-opportunity-list{display:grid;gap:14px}
+.report-opportunity,.report-recommendation,.report-roadmap-phase{padding:15px 0;border-top:1px solid #293d4f;break-inside:avoid}
+.report-opportunity-top{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center}
+.report-rank{display:grid;place-items:center;width:25px;height:25px;border-radius:50%;background:#183b3b;color:#7fe0c8;font-weight:800}
+.report-opportunity-top h3,.report-recommendation h3,.report-roadmap-phase h3{font-size:13px;margin:0 0 4px}
+.report-opportunity-top small,.report-roadmap-phase small{font-size:9px;color:#91a2b4}
+.report-opportunity-top>strong{font-size:14px;color:#7fe0c8}
+.report-opportunity p,.report-recommendation p,.report-roadmap-phase p,.report-assumptions p,.report-roadmap-direction p{font-size:10px;line-height:1.65;color:#b4c3ce;white-space:pre-wrap;margin:7px 0}
+.report-opportunity-metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:12px 0}
+.report-opportunity-metrics span{display:grid;gap:5px;padding:9px;background:#0b1722;border-radius:5px}
+.report-opportunity-metrics small{font-size:8px;color:#91a2b4}
+.report-opportunity-metrics b{font-size:11px;overflow-wrap:anywhere}
+.report-assumptions,.report-roadmap-direction{padding:13px;margin-top:15px;background:#0b1722;border-radius:6px;break-inside:avoid}
+.report-assumptions>b,.report-roadmap-direction>b{font-size:11px}
+.report-recommendation{margin-top:10px}
+.report-roadmap-timeline{margin-top:18px;border-left:2px solid #55cbb0;padding-left:17px}
+.report-roadmap-phase{position:relative;padding:0 0 16px 4px}
+.report-roadmap-phase:before{content:"";position:absolute;left:-24px;top:3px;width:10px;height:10px;border-radius:50%;background:#55cbb0}
+.report-approved-synthesis{border-top:3px solid #55cbb0}
+@media(max-width:760px){.report-opportunity-metrics{grid-template-columns:repeat(2,1fr)}}
+@media print{
+.report-kicker,.report-opportunity-top>strong{color:#176b5d!important}
+.report-opportunity,.report-recommendation,.report-roadmap-phase{border-color:#ddd!important}
+.report-opportunity p,.report-recommendation p,.report-roadmap-phase p,.report-assumptions p,.report-roadmap-direction p,.report-intro{color:#333!important}
+.report-opportunity-metrics span,.report-assumptions,.report-roadmap-direction{background:#f5f7f8!important}
+.report-opportunity-metrics b,.report-assumptions>b,.report-roadmap-direction>b{color:#111!important}
+.report-rank{background:#e8f3f0!important;color:#176b5d!important}
+.report-roadmap-timeline{border-color:#176b5d!important}
+.report-roadmap-phase:before{background:#176b5d!important}
+}
