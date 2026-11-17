@@ -2,7 +2,7 @@ import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
 import { getCurrentOrganization } from "@/lib/tenant";
-import { createEvidenceSnapshot, generateDeterministicDiagnosis } from "./actions";
+import { createEvidenceSnapshot, generateDeterministicDiagnosis, saveAdvisorSignalReview } from "./actions";
 
 export const instant=false;
 
@@ -49,7 +49,12 @@ export default async function EngagementIntelligencePage({params,searchParams}:{
         </div>
         <p className="intelligence-meta">Generated {fmt(active.created_at)} · Engine: {active.analysis_output?.engine||"Deterministic rules"}</p>
         <h3>Review signals</h3>
-        {(active.analysis_output?.review_signals||[]).length?(active.analysis_output.review_signals||[]).map((s:any)=><article className="diagnostic-item" key={s.id}><div className="evidence-register-heading"><b>{s.title}</b><span>{s.priority}</span></div><small>{s.dimension}</small><p>{s.observation}</p><p><b>Rating:</b> {s.rating}/5 · <b>Evidence confidence:</b> {s.confidence}</p><p><b>Rationale recorded:</b> {s.rationale_present?"Yes":"No"}</p><small>Source: Instrument {s.source?.instrument_number} · {s.source?.question_keys?.join(", ")}</small></article>):<p>No deterministic review signals were triggered by the current rules.</p>}
+        {(active.analysis_output?.review_signals||[]).length?(active.analysis_output.review_signals||[]).map((s:any)=>{
+          const review=(active.analysis_output?.advisor_review?.signals||[]).find((r:any)=>r.signal_id===s.id);
+          return <article className="diagnostic-item" key={s.id}><div className="evidence-register-heading"><b>{s.title}</b><span>{review?review.disposition.replaceAll("_"," "):s.priority}</span></div><small>{s.dimension}</small><p>{s.observation}</p><p><b>Rating:</b> {s.rating}/5 · <b>Evidence confidence:</b> {s.confidence}</p><p><b>Rationale recorded:</b> {s.rationale_present?"Yes":"No"}</p><small>Source: Instrument {s.source?.instrument_number} · {s.source?.question_keys?.join(", ")}</small>
+            {review?<div className="advisor-review-saved"><b>Advisor review recorded</b><p>{review.note}</p><small>Reviewed {fmt(review.reviewed_at)}</small></div>:active.analysis_output?.mode==="TEST_ONLY"?<p className="intelligence-meta">Advisor disposition is disabled for synthetic test data.</p>:<form action={saveAdvisorSignalReview.bind(null,id,active.id,s.id)} className="advisor-review-form"><label>Advisor disposition<select name="disposition" required defaultValue="needs_validation"><option value="needs_validation">Needs further validation</option><option value="supported_for_further_review">Supported for further review</option><option value="not_supported">Not supported by available evidence</option></select></label><label>Review note<textarea name="note" required rows={2} placeholder="Document what was reviewed, what evidence is still needed, or why this signal is not supported." /></label><button className="secondary-button" type="submit">Save advisor review</button></form>}
+          </article>;
+        }):<p>No deterministic review signals were triggered by the current rules.</p>}
         <h3>Evidence gaps</h3>
         {(active.analysis_output?.evidence_gaps||[]).length?(active.analysis_output.evidence_gaps||[]).map((g:any)=><article className="diagnostic-item" key={g.id}><b>{g.title}</b><p>{g.count} item(s) require attention.</p>{g.items?.slice(0,8).map((item:any,i:number)=><small key={i}>• {item.instrument_name||item.dimension||"Evidence"} — {item.label||item.task||item.question_key||"Review required"}</small>)}</article>):<p>No missing-required or placeholder-only fields were identified by this pass.</p>}
         <h3>Validation queue</h3>
