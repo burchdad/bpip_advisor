@@ -28,7 +28,7 @@ export default function AssessmentWizard({sections,children,exitHref,completeLab
    </aside>
    <section className="wizard-workspace">
     <div className="wizard-section-heading"><div><span>SECTION {String(active+1).padStart(2,"0")}</span><h2>{current?.title}</h2><p>{current?.description||"Complete the questions in this section before moving on."}</p></div><div className="wizard-section-count">{current?.answered}/{current?.count}<small>answered</small></div></div>
-    <div className="wizard-panel">{panels[active]}</div>
+    <div className="wizard-panel">{panels.map((panel,i)=><div key={sections[i]?.title||i} className="wizard-panel-section" hidden={i!==active}>{panel}</div>)}</div>
    </section>
   </div>
   <div className="wizard-actionbar">
