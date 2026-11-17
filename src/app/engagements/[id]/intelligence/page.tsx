@@ -47,6 +47,23 @@ export default async function EngagementIntelligencePage({params,searchParams}:{
         <section className="intelligence-panel"><div className="intelligence-panel-head"><div><small>INSTRUMENT COVERAGE</small><h2>Captured source material</h2></div></div>
           {(snapshot.assessments||[]).map((a:any)=><div className="intelligence-source-row" key={a.assessment_id}><div><b>{String(a.instrument_number).padStart(2,"0")} · {a.instrument_name}</b><small>{a.status.replaceAll("_"," ")} · {a.populated_response_count} populated / {a.response_count} records</small></div>{a.synthetic_marker_count>0?<span className="instrument-status status-in_progress">{a.synthetic_marker_count} test markers</span>:<span className="instrument-status instrument-submitted">Captured</span>}</div>)}
         </section>
+        <details className="intelligence-json intelligence-register"><summary>Browse response-level evidence register ({quality.populated_response_records??0} populated fields)</summary>
+          {(snapshot.assessments||[]).map((a:any)=><section key={a.assessment_id} className="evidence-register-instrument">
+            <h3>{String(a.instrument_number).padStart(2,"0")} · {a.instrument_name}</h3>
+            {(a.responses||[]).filter((r:any)=>r.populated).map((r:any)=>{
+              const sections=a.schema_definition?.sections||[];
+              const section=sections.find((s:any)=>(s.questions||[]).some((q:any)=>q.key===r.question_key));
+              const question=section?.questions?.find((q:any)=>q.key===r.question_key);
+              const raw=typeof r.response_value==="string"?r.response_value:JSON.stringify(r.response_value);
+              return <article className="evidence-register-row" key={r.question_key}>
+                <div className="evidence-register-heading"><b>{question?.label||r.question_key}</b><span>{r.question_key}</span></div>
+                {section?<small className="evidence-register-section">{section.title}</small>:null}
+                <p>{raw}</p>
+                <div className="evidence-register-meta"><span>Evidence: {r.evidence_status||"Unclassified"}</span><span>{r.synthetic_marker_detected?"TEST / SYNTHETIC MARKER DETECTED":"No test marker detected"}</span></div>
+              </article>;
+            })}
+          </section>)}
+        </details>
         <details className="intelligence-json"><summary>Inspect source snapshot JSON</summary><pre>{JSON.stringify(snapshot,null,2)}</pre></details>
       </>:<div className="intelligence-empty"><h2>No evidence snapshot yet</h2><p>Create the first snapshot to preserve a versioned copy of the nine assessment instruments and their evidence classifications.</p></div>}
       {runs.length>1?<section className="intelligence-panel"><h2>Previous snapshots</h2>{(runs as any[]).slice(1).map(r=><p key={r.id}><a href={"/engagements/"+id+"/intelligence?run="+r.id}>{fmt(r.created_at)} · {r.run_type.replaceAll("_"," ")} · {r.run_status}</a></p>)}</section>:null}
