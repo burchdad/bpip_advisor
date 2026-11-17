@@ -32,7 +32,7 @@ export default async function OperationalAssessmentPage({params,searchParams}:{p
  <div className="assessment-guidance"><b>Assessment principles</b><p>Evaluate how work actually flows, not just how procedures are intended to work. Distinguish direct observation and records from owner or employee statements and advisor hypotheses. Use defined units and periods for metrics. Missing KPIs do not automatically mean poor performance. Consider service quality, employee workload, safety, compliance, key-person dependency and the organization's capacity to absorb change.</p></div>
  <form action={saveOperationalAssessment} className="discovery-form"><input type="hidden" name="engagement_id" value={id}/><input type="hidden" name="assessment_id" value={assessmentId}/>
  <AssessmentWizard sections={sections.map(s=>({title:s.title,description:s.description,count:s.questions.length,keys:s.questions.map(q=>q.key),answeredKeys:s.questions.filter(q=>String(answers[q.key]??"").trim().length>0).map(q=>q.key),answered:s.questions.filter(q=>String(answers[q.key]??"").trim().length>0).length}))} exitHref={"/engagements/"+id} completeLabel="Complete assessment">{sections.map(section=><section className="discovery-section" key={section.id}><div className="discovery-section-heading"><h2>{section.title}</h2><p>{section.description}</p></div>
- {section.questions.map(q=><AssessmentQuestion key={q.key} q={q} value={answers[q.key]||""} placeholder="Enter response..."/>)</section>)}</AssessmentWizard>
+ {section.questions.map(q=><AssessmentQuestion key={q.key} q={q} value={answers[q.key]||""} placeholder="Enter response..."/>)} </section>)}</AssessmentWizard>
  
  </form></div><footer>BPIP · Advisor Edition · Confidential workspace</footer></section></main>;
 }
