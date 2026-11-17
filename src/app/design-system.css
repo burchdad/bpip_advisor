@@ -73,3 +73,15 @@ header:not(.topbar)>span{float:right}
 .wizard-exit{font-size:10px;color:#728293;text-decoration:none;padding:8px}.wizard-exit:hover{color:var(--accent-dark)}.wizard-action-right{display:flex;align-items:center;gap:8px}.wizard-actionbar button{min-height:36px;padding:8px 13px;border-radius:8px;font-size:10px;font-weight:750;cursor:pointer;transition:background .15s,border-color .15s}.wizard-save{background:#fff;border:1px solid #dce4eb;color:#536779}.wizard-save:hover{background:#f6f9fa}.wizard-previous{background:#f1f5f7;border:1px solid #e1e8ed;color:#536779}.wizard-previous:disabled{opacity:.4;cursor:not-allowed}.wizard-next,.wizard-complete{background:var(--accent);border:1px solid var(--accent);color:#fff}.wizard-next:hover,.wizard-complete:hover{background:var(--accent-dark);border-color:var(--accent-dark)}.wizard-next span,.wizard-complete span{margin-left:8px}
 @media(max-width:920px){.wizard-layout{grid-template-columns:1fr}.wizard-rail{padding:11px!important}.wizard-rail nav{display:flex;overflow-x:auto;gap:6px;padding-bottom:3px}.wizard-step{flex:0 0 185px;grid-template-columns:25px minmax(0,1fr);border:1px solid var(--line);padding:8px}.wizard-step-meter{display:none}.wizard-rail-note{display:none}}
 @media(max-width:600px){.assessment-wizard{gap:10px;padding-bottom:86px}.wizard-overview{padding:12px}.wizard-layout{gap:10px}.wizard-rail{padding:9px!important}.wizard-step{flex-basis:160px}.wizard-section-heading{padding:15px;gap:10px}.wizard-section-heading h2{font-size:17px}.wizard-section-count{min-width:45px}.wizard-panel{padding:13px}.wizard-actionbar{bottom:5px;padding:8px;gap:4px}.wizard-exit{font-size:9px;padding:5px}.wizard-action-right{gap:5px}.wizard-actionbar button{padding:7px 9px;font-size:9px;min-height:34px}.wizard-save{display:none}}
+
+
+/* Assessment wizard safety and live state */
+.wizard-panel-section[hidden]{display:none!important}
+.wizard-unsaved,.wizard-saved{margin-top:9px;font-size:10px;font-weight:650}
+.wizard-unsaved{color:#9a6425;background:#fff7e9;border:1px solid #f0dfbf;border-radius:8px;padding:7px 10px}
+.wizard-saved{color:#28745e}
+.wizard-step:focus-visible,.wizard-actionbar button:focus-visible,.wizard-exit:focus-visible{outline:3px solid #65cbb5;outline-offset:3px}
+.wizard-panel .discovery-question input[type=radio],.wizard-panel .discovery-question input[type=checkbox]{accent-color:var(--accent);width:17px;height:17px;min-height:17px}
+.wizard-panel .discovery-question input[type=number]{font-variant-numeric:tabular-nums}
+.wizard-panel .discovery-question textarea{min-height:104px;resize:vertical}
+@media(max-width:920px){.wizard-panel-section[hidden]{display:none!important}}
