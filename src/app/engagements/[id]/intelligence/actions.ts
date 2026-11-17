@@ -347,6 +347,11 @@ export async function approveExecutiveSynthesis(engagementId:string,runId:string
     redirect("/engagements/"+engagementId+"/intelligence?run="+runId+"&approval=integrity");
   }
   const snapshot=run.source_snapshot||{};
+  const snapshotHasSyntheticMarkers=Boolean(snapshot.data_quality?.synthetic_data_detected)||
+    (snapshot.assessments||[]).some((assessment:any)=>(assessment.responses||[]).some((response:any)=>response.synthetic_marker_detected));
+  if(snapshotHasSyntheticMarkers){
+    redirect("/engagements/"+engagementId+"/intelligence?run="+runId+"&approval=integrity");
+  }
   const sourceRefs=new Set<string>();
   for(const assessment of snapshot.assessments||[]){
     for(const response of assessment.responses||[]){
