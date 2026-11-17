@@ -2,6 +2,7 @@ import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
 import AssessmentWizard from "@/components/assessment-wizard";
+import AssessmentQuestion from "@/components/assessment-question";
 import { getCurrentOrganization } from "@/lib/tenant";
 import { saveOperationalAssessment } from "./operational-actions";
 export const instant=false;
@@ -31,10 +32,7 @@ export default async function OperationalAssessmentPage({params,searchParams}:{p
  <div className="assessment-guidance"><b>Assessment principles</b><p>Evaluate how work actually flows, not just how procedures are intended to work. Distinguish direct observation and records from owner or employee statements and advisor hypotheses. Use defined units and periods for metrics. Missing KPIs do not automatically mean poor performance. Consider service quality, employee workload, safety, compliance, key-person dependency and the organization's capacity to absorb change.</p></div>
  <form action={saveOperationalAssessment} className="discovery-form"><input type="hidden" name="engagement_id" value={id}/><input type="hidden" name="assessment_id" value={assessmentId}/>
  <AssessmentWizard sections={sections.map(s=>({title:s.title,description:s.description,count:s.questions.length,keys:s.questions.map(q=>q.key),answeredKeys:s.questions.filter(q=>String(answers[q.key]??"").trim().length>0).map(q=>q.key),answered:s.questions.filter(q=>String(answers[q.key]??"").trim().length>0).length}))} exitHref={"/engagements/"+id} completeLabel="Complete assessment">{sections.map(section=><section className="discovery-section" key={section.id}><div className="discovery-section-heading"><h2>{section.title}</h2><p>{section.description}</p></div>
- {section.questions.map(q=><label className="discovery-question" key={q.key}><span>{q.label}{q.required?<em> *</em>:null}</span>
- {q.type==="select"?<select name={q.key} defaultValue={answers[q.key]||""}><option value="">Select an option</option>{(q.options||[]).map(o=><option key={o} value={o}>{o}</option>)}</select>:q.type==="number"?<input type="number" name={q.key} step="any" min="0" defaultValue={answers[q.key]||""} placeholder="Leave blank if unknown"/>:q.type==="date"?<input type="date" name={q.key} defaultValue={answers[q.key]||""}/>:q.type==="text"?<input type="text" name={q.key} defaultValue={answers[q.key]||""} placeholder={q.prompt||"Enter response..."}/>:<textarea name={q.key} rows={3} defaultValue={answers[q.key]||""} placeholder={q.prompt||"Enter advisor assessment..."}/>}
- {q.unit?<small>Unit: {q.unit}. Leave blank if unknown; document the period and source.</small>:null}{q.prompt?<small>{q.prompt}</small>:null}</label>)}
- </section>)}</AssessmentWizard>
+ {section.questions.map(q=><AssessmentQuestion q={q} value={answers[q.key]||""} placeholder="Enter response..."/></section>)}</AssessmentWizard>
  
  </form></div><footer>BPIP · Advisor Edition · Confidential workspace</footer></section></main>;
 }
