@@ -2,7 +2,7 @@ import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
 import { getCurrentOrganization } from "@/lib/tenant";
-import { createEvidenceSnapshot } from "./actions";
+import { createEvidenceSnapshot, generateDeterministicDiagnosis } from "./actions";
 
 export const instant=false;
 
@@ -38,6 +38,25 @@ export default async function EngagementIntelligencePage({params,searchParams}:{
       <div className="detail-heading"><div><small>{engagement.business_name} · ADVISOR WORKSPACE</small><h1>Advisor intelligence</h1><p>Build a traceable evidence snapshot before producing an executive diagnosis or recommendations.</p></div><span className="engagement-status status-in_progress">Evidence stage</span></div>
       <div className="intelligence-callout"><b>Analysis integrity gate</b><p>BPIP preserves original assessment responses. This workspace creates a separate, versioned source snapshot. It does not convert owner statements or hypotheses into verified facts, and it does not approve recommendations.</p></div>
       <form action={createEvidenceSnapshot.bind(null,id)}><button className="primary-button" type="submit">Build new evidence snapshot</button></form>
+      {active?.run_type==="evidence_synthesis"?<form action={generateDeterministicDiagnosis.bind(null,id,active.id)} className="intelligence-action-form"><button className="primary-button" type="submit">Generate deterministic diagnostic preview</button><small>Rule-based analysis · no AI-generated conclusions · creates a separate versioned run</small></form>:null}
+      {active?.run_type==="executive_diagnosis"?<section className="intelligence-panel diagnostic-panel">
+        <div className="intelligence-panel-head"><div><small>DETERMINISTIC DIAGNOSTIC · {active.analysis_output?.engine_version||"versioned"}</small><h2>Diagnostic preview</h2></div><span className="instrument-status instrument-submitted">{active.run_status}</span></div>
+        <div className="intelligence-gate"><b>{active.analysis_output?.mode==="TEST_ONLY"?"TEST MODE — NOT BUSINESS FINDINGS":"Advisor review required"}</b><p>{active.analysis_output?.interpretation_gate}</p></div>
+        <div className="detail-stats">
+          <div><small>REVIEW SIGNALS</small><b>{active.analysis_output?.executive_summary?.review_signals??0}</b><span>not confirmed findings</span></div>
+          <div><small>REQUIRED GAPS</small><b>{active.analysis_output?.executive_summary?.required_gaps??0}</b><span>missing / placeholder</span></div>
+          <div><small>ROOT CAUSES</small><b>0</b><span>none established</span></div>
+        </div>
+        <p className="intelligence-meta">Generated {fmt(active.created_at)} · Engine: {active.analysis_output?.engine||"Deterministic rules"}</p>
+        <h3>Review signals</h3>
+        {(active.analysis_output?.review_signals||[]).length?(active.analysis_output.review_signals||[]).map((s:any)=><article className="diagnostic-item" key={s.id}><div className="evidence-register-heading"><b>{s.title}</b><span>{s.priority}</span></div><small>{s.dimension}</small><p>{s.observation}</p><p><b>Rating:</b> {s.rating}/5 · <b>Evidence confidence:</b> {s.confidence}</p><p><b>Rationale recorded:</b> {s.rationale_present?"Yes":"No"}</p><small>Source: Instrument {s.source?.instrument_number} · {s.source?.question_keys?.join(", ")}</small></article>):<p>No deterministic review signals were triggered by the current rules.</p>}
+        <h3>Evidence gaps</h3>
+        {(active.analysis_output?.evidence_gaps||[]).length?(active.analysis_output.evidence_gaps||[]).map((g:any)=><article className="diagnostic-item" key={g.id}><b>{g.title}</b><p>{g.count} item(s) require attention.</p>{g.items?.slice(0,8).map((item:any,i:number)=><small key={i}>• {item.instrument_name||item.dimension||"Evidence"} — {item.label||item.task||item.question_key||"Review required"}</small>)}</article>):<p>No missing-required or placeholder-only fields were identified by this pass.</p>}
+        <h3>Validation queue</h3>
+        {(active.analysis_output?.validation_queue||[]).map((item:any,i:number)=><article className="diagnostic-item" key={i}><b>{item.priority} · {item.task}</b><p>{item.reason}</p></article>)}
+        <h3>Guardrails</h3><ul>{(active.analysis_output?.guardrails||[]).map((g:string,i:number)=><li key={i}>{g}</li>)}</ul>
+        <p><a href={"/engagements/"+id+"/intelligence?run="+(active.analysis_output?.source_run_id||"")}>Open source evidence snapshot →</a></p>
+      </section>:null}
       {active?<>
         <section className="intelligence-panel"><div className="intelligence-panel-head"><div><small>LATEST SOURCE SNAPSHOT</small><h2>{active.run_type.replaceAll("_"," ")}</h2></div><span className="instrument-status instrument-submitted">{active.run_status}</span></div>
           <div className="detail-stats"><div><small>INSTRUMENTS</small><b>{quality.assessment_count??active.source_assessment_count}</b><span>captured</span></div><div><small>RESPONSE RECORDS</small><b>{active.source_response_count}</b><span>including blank fields</span></div><div><small>POPULATED FIELDS</small><b>{quality.populated_response_records??"—"}</b><span>non-empty values</span></div></div>
