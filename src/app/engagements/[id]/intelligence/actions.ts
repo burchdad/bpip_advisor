@@ -323,3 +323,68 @@ Rules:
   }
   redirect("/engagements/"+engagementId+"/intelligence?run="+runId);
 }
+
+
+export async function approveExecutiveSynthesis(engagementId:string,runId:string,formData:FormData){
+  const {db,organizationId,userId}=await getCurrentOrganization();
+  const signoff=String(formData.get("advisor_signoff")||"");
+  const note=String(formData.get("approval_note")||"").trim();
+  if(signoff!=="yes"||note.length<20){
+    redirect("/engagements/"+engagementId+"/intelligence?run="+runId+"&approval=required");
+  }
+  const rows=await db.query(
+    `select id,run_status,run_type,source_snapshot,analysis_output
+     from engagement_intelligence_runs
+     where id=$1 and engagement_id=$2 and organization_id=$3 and run_type='executive_report'
+     limit 1`,
+    [runId,engagementId,organizationId]
+  );
+  if(!rows.length)redirect("/engagements/"+engagementId+"/intelligence");
+  const run=rows[0] as any;
+  if(run.run_status!=="generated")redirect("/engagements/"+engagementId+"/intelligence?run="+runId+"&approval=locked");
+  const output=run.analysis_output||{};
+  if(output.integrity?.synthetic_data_detected||output.citation_validation?.all_rendered_citations_verified!==true||!output.executive_summary?.evidence_refs?.length){
+    redirect("/engagements/"+engagementId+"/intelligence?run="+runId+"&approval=integrity");
+  }
+  const snapshot=run.source_snapshot||{};
+  const sourceRefs=new Set<string>();
+  for(const assessment of snapshot.assessments||[]){
+    for(const response of assessment.responses||[]){
+      if(response.populated&&!response.synthetic_marker_detected){
+        sourceRefs.add("I"+assessment.instrument_number+":"+response.question_key);
+      }
+    }
+  }
+  const claimLists=[
+    [output.executive_summary],
+    output.key_observations||[],
+    output.cross_dimensional_synthesis||[],
+    output.strategic_implications||[],
+    output.priority_questions||[]
+  ];
+  const claims=claimLists.flat().filter(Boolean);
+  const invalid=claims.some((claim:any)=>!Array.isArray(claim.evidence_refs)||claim.evidence_refs.length===0||claim.evidence_refs.some((ref:string)=>!sourceRefs.has(ref)));
+  if(invalid)redirect("/engagements/"+engagementId+"/intelligence?run="+runId+"&approval=integrity");
+  const approvedAt=new Date().toISOString();
+  const nextOutput={
+    ...output,
+    advisor_approval:{
+      status:"approved",
+      signoff_note:note,
+      approved_by:userId,
+      approved_at:approvedAt,
+      citation_revalidation:{source_ref_count:sourceRefs.size,claims_checked:claims.length,all_claims_resolve_to_snapshot:true},
+      attestation:"Advisor reviewed the synthesis, evidence references, evidence classifications, limitations, and conditions before approval."
+    }
+  };
+  const updated=await db.query(
+    `update engagement_intelligence_runs
+     set analysis_output=$1::jsonb,run_status='approved',
+         reviewed_by=$2,reviewed_at=$3,approved_by=$2,approved_at=$3,updated_at=now()
+     where id=$4 and engagement_id=$5 and organization_id=$6 and run_type='executive_report' and run_status='generated'
+     returning id`,
+    [JSON.stringify(nextOutput),userId,approvedAt,runId,engagementId,organizationId]
+  );
+  if(!updated.length)redirect("/engagements/"+engagementId+"/intelligence?run="+runId+"&approval=locked");
+  redirect("/engagements/"+engagementId+"/intelligence?run="+runId+"&approval=approved");
+}
