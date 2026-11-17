@@ -284,7 +284,7 @@ Rules:
       method:"POST",
       headers:{"Authorization":"Bearer "+token,"Content-Type":"application/json"},
       body:JSON.stringify({model:"openai/gpt-5.4-mini",messages:[{role:"system",content:prompt},{role:"user",content:JSON.stringify(context)}],response_format:{type:"json_object"},max_completion_tokens:6000,temperature:0.2}),
-      signal:AbortSignal.timeout(90000)
+      signal:AbortSignal.timeout(50000)
     });
     if(!response.ok)throw new Error("AI Gateway request failed with status "+response.status);
     const payload=await response.json();
