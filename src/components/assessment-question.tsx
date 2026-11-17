@@ -14,7 +14,7 @@ export default function AssessmentQuestion({q,value,placeholder="Enter response.
    <label className={"assessment-choice assessment-choice-clear"+(!value?" is-selected":"")}><input type="radio" name={q.key} value="" defaultChecked={!value}/><span className="assessment-choice-card"><b>Not assessed</b><small>Leave unanswered</small></span></label>
   </fieldset>:
   <select name={q.key} defaultValue={value}><option value="">Select an option</option>{options.map(o=><option key={o} value={o}>{o}</option>)}</select>
- ):q.type==="number"?<div className="assessment-number-wrap">{q.unit?<span className="assessment-number-unit">{q.unit==="USD"?"$":q.unit}</span>:null}<input type="number" name={q.key} step="any" defaultValue={value} placeholder="Leave blank if unknown"/></div>
+ ):q.type==="number"?<div className="assessment-number-wrap">{q.unit?<span className={"assessment-number-unit "+(q.unit==="USD"?"is-prefix":"is-suffix")}>{q.unit==="USD"?"$":q.unit==="percent"?"%":q.unit}</span>:null}<input type="number" name={q.key} step="any" defaultValue={value} placeholder="Leave blank if unknown"/></div>
  :q.type==="date"?<input type="date" name={q.key} defaultValue={value}/>
  :q.type==="text"?<input type="text" name={q.key} defaultValue={value} placeholder={q.prompt||placeholder}/>
  :<textarea name={q.key} rows={3} defaultValue={value} placeholder={q.prompt||placeholder}/>;
