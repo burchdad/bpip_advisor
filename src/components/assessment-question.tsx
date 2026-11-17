@@ -3,7 +3,7 @@ type Question={key:string;label:string;type:string;required?:boolean;prompt?:str
 export default function AssessmentQuestion({q,value,placeholder="Enter response..."}:{q:Question;value:string;placeholder?:string}){
  const options=q.options||[];
  const numericScale=options.length>0&&options.every(o=>/^[1-5]\s*[—-]/.test(o));
- const evidenceScale=options.length>0&&options.some(o=>o.startsWith("Verified"))&&options.some(o=>o.startsWith("Insufficient"));
+ const evidenceScale=options.length>=3&&/evidence|confidence/i.test(q.key+" "+q.label);
  const choiceScale=numericScale||evidenceScale;
  const control:ReactNode=q.type==="select"?(choiceScale?
   <fieldset className={"assessment-choice-group"+(numericScale?" is-rating":" is-evidence")} aria-label={q.label}>
